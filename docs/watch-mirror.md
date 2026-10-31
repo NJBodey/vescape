@@ -556,7 +556,9 @@ Adding a mirrored setting:
 
 Rider Units travels on this channel as `distanceUnit`, defaulting to `km` for missing or invalid
 values. Both wrists convert speed, navigation, radar, and accessibility readouts while frame values,
-route geometry, and gauge proportions stay metric.
+route geometry, and gauge proportions stay metric. The weather temperature preference travels as
+`temperatureUnit` (`celsius` or `fahrenheit`), defaulting to `celsius` for missing or invalid values;
+Wear OS converts weather readouts with it. watchOS does not receive it yet and still shows °C.
 
 The rider colour is another of these: pick a colour on the phone and the wrist route, chevron and
 rider dot follow it. The watchOS Mirror carries the same bag on its own channel — see

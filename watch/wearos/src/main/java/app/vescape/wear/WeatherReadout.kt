@@ -18,16 +18,19 @@ import androidx.compose.ui.unit.sp
 import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
+import expo.modules.vescapecore.telemetry.UnitPresentation
 
 /**
- * A temperature with its degree mark tucked against the last digit. The ° hangs on the digits as an
- * overlay, so it never shifts where the number itself lands: "21°" and "20" share one centre, and
- * the mark is a tail, not part of the column.
+ * A °C temperature in the rider's unit, with its degree mark tucked against the last digit. The °
+ * hangs on the digits as an overlay, so it never shifts where the number itself lands: "21°" and
+ * "20" share one centre, and the mark is a tail, not part of the column.
  *
  * @parity /watch/watchos/WeatherGlyph.swift `DegreeNumber`
+ * TODO(watchOS parity): convert to the rider's temperature unit; watchOS still draws °C.
  */
 @Composable
-internal fun DegreeTemp(value: Int, style: TextStyle, color: Color, modifier: Modifier = Modifier) {
+internal fun DegreeTemp(celsius: Int, style: TextStyle, color: Color, modifier: Modifier = Modifier) {
+    val value = UnitPresentation.wholeTemperatureFromC(celsius.toDouble(), SettingsState.settings.value.temperatureUnit)
     Box(modifier = modifier, contentAlignment = Alignment.Center) {
         Text(text = value.toString(), style = style, color = color)
         Text(
@@ -81,7 +84,7 @@ internal fun WeatherReadout(muted: Boolean, onClick: (() -> Unit)?, modifier: Mo
                 modifier = Modifier.size(READOUT_ICON_SIZE),
             )
             DegreeTemp(
-                value = forecast.temperatureC,
+                celsius = forecast.temperatureC,
                 style = WatchTypography.mono(MaterialTheme.typography.caption2.copy(fontSize = READOUT_FONT_SIZE)),
                 color = textColor,
                 modifier = Modifier.padding(start = 3.dp),

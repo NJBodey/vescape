@@ -176,7 +176,7 @@ export default function WeatherPage() {
 
         <ShowcaseCard name="WeatherHourlyStrip">
           <View style={styles.stripPreview}>
-            <WeatherHourlyStrip hours={MOCK_HOURLY} />
+            <WeatherHourlyStrip hours={MOCK_HOURLY} temperatureUnit="celsius" />
           </View>
         </ShowcaseCard>
 

@@ -5,9 +5,16 @@ import { Text } from '@/components/base/Text'
 import { WeatherIcon } from '@/modules/weather/components/WeatherIcon'
 import { theme } from '@/constants/theme'
 import { formatHour } from '@/helpers/format'
+import { wholeTemperatureFromC, type TemperatureUnit } from '@/helpers/units'
 import { weatherIconColor } from '@/modules/weather/lib/weather'
 
-function HourItem({ item }: { item: WeatherHour }) {
+function HourItem({
+  item,
+  temperatureUnit,
+}: {
+  item: WeatherHour
+  temperatureUnit: TemperatureUnit
+}) {
   return (
     <View style={styles.item}>
       <Text style={styles.hour}>{formatHour(item.minuteOfDay)}</Text>
@@ -17,7 +24,7 @@ function HourItem({ item }: { item: WeatherHour }) {
         color={weatherIconColor(item.icon)}
         weight="duotone"
       />
-      <Text style={styles.temp}>{item.temperatureC}°</Text>
+      <Text style={styles.temp}>{wholeTemperatureFromC(item.temperatureC, temperatureUnit)}°</Text>
       {item.precipitationProbability > 0 && (
         <Text style={styles.precip}>{item.precipitationProbability}%</Text>
       )}
@@ -26,7 +33,13 @@ function HourItem({ item }: { item: WeatherHour }) {
 }
 
 /** Horizontal scroll of hourly forecast items. */
-export function WeatherHourlyStrip({ hours }: { hours: WeatherHour[] }) {
+export function WeatherHourlyStrip({
+  hours,
+  temperatureUnit,
+}: {
+  hours: WeatherHour[]
+  temperatureUnit: TemperatureUnit
+}) {
   return (
     <ScrollView
       horizontal
@@ -35,7 +48,7 @@ export function WeatherHourlyStrip({ hours }: { hours: WeatherHour[] }) {
       style={styles.container}
     >
       {hours.map((item) => (
-        <HourItem key={item.minuteOfDay} item={item} />
+        <HourItem key={item.minuteOfDay} item={item} temperatureUnit={temperatureUnit} />
       ))}
     </ScrollView>
   )

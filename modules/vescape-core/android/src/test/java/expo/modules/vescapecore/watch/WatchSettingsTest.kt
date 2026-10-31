@@ -22,6 +22,7 @@ class WatchSettingsTest {
             "wearStreetMapEnabled" to AppSettings(wearStreetMapEnabled = false),
             "wearMapGaugesPercent" to AppSettings(wearMapGaugesPercent = 90),
             "distanceUnit" to AppSettings(distanceUnit = "mi"),
+            "temperatureUnit" to AppSettings(temperatureUnit = "fahrenheit"),
             "wearTiltRatePercent" to AppSettings(wearTiltRatePercent = 40),
         )
         val mirroredFields = WatchSettings::class.java.declaredFields.count { !java.lang.reflect.Modifier.isStatic(it.modifiers) }

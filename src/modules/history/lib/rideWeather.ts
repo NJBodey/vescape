@@ -2,8 +2,8 @@ import type { RideWeather } from 'vescape-core'
 
 import {
   speedFromKmh,
-  temperatureFromC,
   temperatureSymbol,
+  wholeTemperatureFromC,
   type TemperatureUnit,
   type DistanceUnit,
 } from '@/helpers/units'
@@ -14,7 +14,7 @@ const SINGLE_TEMPERATURE_SPREAD_C = 3
 /** `14` when the ride barely changed, otherwise `8–20`; spread is judged in °C. */
 export function rideTemperatureValue(weather: RideWeather, unit: TemperatureUnit): string {
   const { minTemperatureC: min, maxTemperatureC: max } = weather
-  const shown = (celsius: number) => Math.round(temperatureFromC(celsius, unit))
+  const shown = (celsius: number) => wholeTemperatureFromC(celsius, unit)
   if (max - min < SINGLE_TEMPERATURE_SPREAD_C) return String(shown((min + max) / 2))
   return `${shown(min)}–${shown(max)}`
 }

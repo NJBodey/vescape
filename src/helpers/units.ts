@@ -126,6 +126,11 @@ export function temperatureFromC(celsius: number, unit: TemperatureUnit): number
   return unit === 'fahrenheit' ? (celsius * 9) / 5 + 32 : celsius
 }
 
+/** Whole-degree reading in the rider's unit; round after conversion. */
+export function wholeTemperatureFromC(celsius: number, unit: TemperatureUnit): number {
+  return Math.round(temperatureFromC(celsius, unit))
+}
+
 export function temperatureSymbol(unit: TemperatureUnit): '°C' | '°F' {
   return unit === 'fahrenheit' ? '°F' : '°C'
 }

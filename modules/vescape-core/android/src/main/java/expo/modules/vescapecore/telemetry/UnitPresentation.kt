@@ -3,6 +3,7 @@ package expo.modules.vescapecore.telemetry
 /**
  * @parity /modules/vescape-core/ios/telemetry/UnitPresentation.swift
  * @parity /src/helpers/units.ts
+ * TODO(iOS parity): add temperatureFromC / wholeTemperatureFromC to UnitPresentation.swift.
  */
 object UnitPresentation {
     const val METERS_PER_MILE = 1609.344
@@ -19,4 +20,10 @@ object UnitPresentation {
         val unit = if (miles) { if (short) "ft" else "mi" } else { if (short) "m" else "km" }
         return String.format(java.util.Locale.US, if (short) "%.0f %s" else "%.1f %s", value, unit)
     }
+    /** Temperatures are canonical °C; anything but `fahrenheit` stays Celsius. */
+    fun temperatureFromC(celsius: Double, temperatureUnit: String): Double =
+        if (temperatureUnit == "fahrenheit") celsius * 9.0 / 5.0 + 32.0 else celsius
+    /** Whole-degree reading; round after conversion. */
+    fun wholeTemperatureFromC(celsius: Double, temperatureUnit: String): Int =
+        Math.round(temperatureFromC(celsius, temperatureUnit)).toInt()
 }
