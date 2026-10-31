@@ -1,5 +1,5 @@
 import { copyFileSync, existsSync, mkdirSync, readdirSync, rmSync } from 'fs'
-import { dirname, extname, join, parse, relative } from 'path'
+import { dirname, extname, join, parse, relative, sep } from 'path'
 
 const ROOT = join(import.meta.dir, '..')
 
@@ -84,12 +84,20 @@ export function sharedTargets(root = ROOT): SharedTarget[] {
   ]
 }
 
+/**
+ * `relative()` with `/` separators on every platform. These paths are identifiers (filter input,
+ * copy sets, fingerprint keys), and Windows' `\` would otherwise make them differ by OS.
+ */
+export function posixRelative(from: string, to: string): string {
+  return relative(from, to).split(sep).join('/')
+}
+
 /** Files under `dir`, relative to it; one level unless `recursive`. */
 function listFiles(dir: string, recursive: boolean): string[] {
   if (!existsSync(dir)) return []
   return readdirSync(dir, { recursive, withFileTypes: true })
     .filter((entry) => entry.isFile())
-    .map((entry) => relative(dir, join(entry.parentPath, entry.name)))
+    .map((entry) => posixRelative(dir, join(entry.parentPath, entry.name)))
 }
 
 /** Source files a target copies, absolute, sorted. */
@@ -123,7 +131,9 @@ export function copyShared(root = ROOT, { quiet = false } = {}) {
     // that no longer existed in the repo. Only names this target would produce survive, so a
     // destination it shares with anything else is left alone.
     const expected = new Set(
-      sharedSources(target).map((source) => relative(target.dest, sharedOutput(target, source))),
+      sharedSources(target).map((source) =>
+        posixRelative(target.dest, sharedOutput(target, source)),
+      ),
     )
     for (const file of listFiles(target.dest, !!target.include)) {
       if (!target.extensions.has(extname(file).toLowerCase()) || expected.has(file)) continue
@@ -136,8 +146,8 @@ export function copyShared(root = ROOT, { quiet = false } = {}) {
       mkdirSync(dirname(output), { recursive: true })
       copyFileSync(source, output)
 
-      const file = relative(target.src, source)
-      const outputName = relative(target.dest, output)
+      const file = posixRelative(target.src, source)
+      const outputName = posixRelative(target.dest, output)
       const renamed = outputName !== file ? ` (→ ${outputName})` : ''
       log(`    ✓ ${file}${renamed}`)
       totalCopied += 1
