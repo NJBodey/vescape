@@ -65,7 +65,12 @@ Board Session does not bypass delivery. Watches restore the retained settings on
 `km` when an older phone omits the key.
 
 Speed, navigation, radar, and accessibility readouts convert on the wrist. Watch Frames, routes,
-gauge fractions, and temperature displays retain their existing units. The phone and wrist compile
+gauge fractions, and board temperature displays retain their existing units.
+
+The separate temperature preference (`celsius` or `fahrenheit`) applies to weather on the phone
+(map pill, mode tab, hourly strip, Ride History) and to spoken temperature alerts. Wear OS receives
+it as `temperatureUnit` on the same settings channel and converts weather readouts; watchOS does not
+receive it yet and still shows weather in °C. The phone and wrist compile
 the same pure native conversion helper on each platform; shared distance fixtures cover the
 0.1-mile and 1-kilometer boundaries across Kotlin, Swift, and TypeScript.
 

@@ -80,7 +80,7 @@ fun WeatherScreen() {
                     modifier = Modifier.size(HERO_ICON_SIZE),
                 )
                 DegreeTemp(
-                    value = forecast.temperatureC,
+                    celsius = forecast.temperatureC,
                     style = WatchTypography.mono(MaterialTheme.typography.display3),
                     color = PrimaryText,
                     modifier = Modifier.padding(start = 8.dp),
@@ -175,7 +175,7 @@ private fun HourColumn(hour: WatchWeatherHour) {
             modifier = Modifier.size(HOUR_ICON_SIZE),
         )
         DegreeTemp(
-            value = hour.temperatureC,
+            celsius = hour.temperatureC,
             style = WatchTypography.mono(MaterialTheme.typography.caption2),
             color = SecondaryText,
         )

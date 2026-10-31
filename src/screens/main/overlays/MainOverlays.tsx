@@ -3,11 +3,13 @@ import { useSharedValue, withTiming, type SharedValue } from 'react-native-reani
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import type { MapPoint, MapPointPatch } from 'vescape-core'
 
+import { wholeTemperatureFromC } from '@/helpers/units'
 import type { Board } from '@/modules/board/store/boardStore'
 import { LegalLimitsMapOverlay } from '@/modules/legal/components/LegalLimitsMapOverlay'
 import type { MapOrientationMode, MapStyleKey } from '@/modules/map/constants/mapStyles'
 import type { MapSelection } from '@/modules/map/lib/mapSelection'
 import type { DirectionPoint } from '@/modules/map/store/mapStore'
+import { useSettingsStore } from '@/modules/settings/store/settingsStore'
 import { WeatherMapOverlay } from '@/modules/weather/components/WeatherMapOverlay'
 import { useWeatherStore } from '@/modules/weather/store/weatherStore'
 import { HistoryOverlay, type MainHistoryOverlayProps } from '@/screens/main/history/HistoryOverlay'
@@ -93,6 +95,7 @@ export function MainOverlays({
 }: MainOverlaysProps) {
   const insets = useSafeAreaInsets()
   const weather = useWeatherStore((s) => s.weather)
+  const temperatureUnit = useSettingsStore((s) => s.temperatureUnit)
   // In the store rather than in state: the map camera frames the route into the space this panel
   // leaves, and it lives in a different tree.
   const panelHeight = useMainScreenStore((s) => s.historyPanelHeight)
@@ -152,7 +155,7 @@ export function MainOverlays({
       {weather && (mode === 'telemetry' || mode === 'map') ? (
         <WeatherSidePill
           icon={weather.icon}
-          temperature={weather.temperatureC}
+          temperature={wholeTemperatureFromC(weather.temperatureC, temperatureUnit)}
           precipProbability={weather.precipitationProbability}
           onPress={map.enterWeather}
         />

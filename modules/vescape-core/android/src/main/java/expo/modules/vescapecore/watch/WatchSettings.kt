@@ -15,6 +15,7 @@ import expo.modules.vescapecore.telemetry.AppSettings
  * The wrist-side peer carries the same path and key names by convention.
  * @parity /watch/wearos/src/main/java/app/vescape/wear/WatchSettings.kt
  * @parity /modules/vescape-core/ios/watch/WatchSettings.swift
+ * TODO(iOS parity): mirror [WATCH_SETTING_TEMPERATURE_UNIT] to watchOS; it still draws weather in °C.
  */
 internal const val WATCH_SETTINGS_PATH = "/settings"
 
@@ -45,6 +46,9 @@ internal const val WATCH_SETTING_MAP_GAUGES = "mapGaugesPercent"
 /** App-wide speed and distance preference; older phones default to metric. */
 internal const val WATCH_SETTING_DISTANCE_UNIT = "distanceUnit"
 
+/** App-wide temperature preference for weather; older phones default to Celsius. */
+internal const val WATCH_SETTING_TEMPERATURE_UNIT = "temperatureUnit"
+
 /** Tilt stick speed at full deflection, percent of full tilt per second. Applied on the wrist. */
 internal const val WATCH_SETTING_TILT_RATE = "tiltRatePercent"
 
@@ -66,6 +70,7 @@ internal val WATCH_SOURCE_SETTING_KEYS = setOf(
     "wearStreetMapEnabled",
     "wearMapGaugesPercent",
     "distanceUnit",
+    "temperatureUnit",
     "wearTiltRatePercent",
     "wearPushRateHz",
 )
@@ -76,6 +81,7 @@ internal data class WatchSettings(
     val boardMoveStrengthPercent: Int,
     val navArrowEnabled: Boolean,
     val distanceUnit: String = "km",
+    val temperatureUnit: String = "celsius",
     val tiltRatePercent: Int = 20,
     val telemetryTrailEnabled: Boolean = true,
     val telemetryGroupEnabled: Boolean = true,
@@ -100,5 +106,6 @@ internal fun AppSettings.toWatchSettings(): WatchSettings = WatchSettings(
     streetMapEnabled = wearStreetMapEnabled,
     mapGaugesPercent = wearMapGaugesPercent,
     distanceUnit = distanceUnit,
+    temperatureUnit = temperatureUnit,
     tiltRatePercent = wearTiltRatePercent,
 )

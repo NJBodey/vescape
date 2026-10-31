@@ -55,6 +55,15 @@ class WatchSettingsTest {
     }
 
     @Test
+    fun `temperature unit defaults to celsius for older phones and unknown values`() {
+        assertEquals("celsius", WatchSettings.decode(emptyMap()).temperatureUnit)
+        for (invalid in listOf(null, "kelvin", "F", true)) {
+            assertEquals("celsius", WatchSettings.decode(mapOf(SETTING_TEMPERATURE_UNIT to invalid)).temperatureUnit)
+        }
+        assertEquals("fahrenheit", WatchSettings.decode(mapOf(SETTING_TEMPERATURE_UNIT to "fahrenheit")).temperatureUnit)
+    }
+
+    @Test
     fun `tilt rate defaults until a phone sends it and is held to a sane range`() {
         assertEquals(DEFAULT_TILT_RATE_PERCENT, WatchSettings.decode(emptyMap()).tiltRatePercent)
         assertEquals(30, WatchSettings.decode(mapOf(SETTING_TILT_RATE to 30)).tiltRatePercent)

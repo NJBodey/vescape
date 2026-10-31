@@ -45,6 +45,9 @@ const val SETTING_MAP_GAUGES = "mapGaugesPercent"
 /** App-wide speed and distance preference; older phones default to metric. */
 const val SETTING_DISTANCE_UNIT = "distanceUnit"
 
+/** App-wide temperature preference for weather; older phones default to Celsius. */
+const val SETTING_TEMPERATURE_UNIT = "temperatureUnit"
+
 /** Tilt stick speed at full deflection, percent of full tilt per second. */
 const val SETTING_TILT_RATE = "tiltRatePercent"
 
@@ -55,6 +58,7 @@ const val DEFAULT_TILT_RATE_PERCENT = 20
 data class WatchSettings(
     val riderColor: Color? = null,
     val distanceUnit: String = "km",
+    val temperatureUnit: String = "celsius",
     /** Off by default: an older phone never sends the key, and the arrow is opt-in until it works. */
     val navArrowEnabled: Boolean = false,
     /** Null until a phone new enough to send it has pushed; the wrist then shows no number. */
@@ -78,6 +82,7 @@ data class WatchSettings(
             mapGaugesPercent = WatchMapGauges.percent(payload[SETTING_MAP_GAUGES]) ?: WatchMapGauges.DEFAULT_PERCENT,
             boardMoveStrengthPercent = payload[SETTING_BOARD_MOVE_STRENGTH] as? Int,
             distanceUnit = if (payload[SETTING_DISTANCE_UNIT] == "mi") "mi" else "km",
+            temperatureUnit = if (payload[SETTING_TEMPERATURE_UNIT] == "fahrenheit") "fahrenheit" else "celsius",
             tiltRatePercent = (payload[SETTING_TILT_RATE] as? Int)?.coerceIn(1, 100) ?: DEFAULT_TILT_RATE_PERCENT,
         )
     }

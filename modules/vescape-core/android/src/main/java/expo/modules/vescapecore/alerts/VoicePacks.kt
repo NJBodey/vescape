@@ -5,6 +5,7 @@ import android.media.MediaCodec
 import android.media.MediaExtractor
 import android.media.MediaFormat
 import expo.modules.vescapecore.diagnostics.UnexpectedNativeError
+import expo.modules.vescapecore.telemetry.UnitPresentation
 import org.json.JSONObject
 import java.nio.ByteOrder
 import java.util.concurrent.ConcurrentHashMap
@@ -164,7 +165,7 @@ internal fun voiceAnnouncement(
     val value = when (type) {
         "percent" -> raw
         "number" -> raw?.let { if (key == "speed" && distanceUnit == "mi") it / KM_PER_MILE else it }
-        "degrees" -> raw?.let { if (temperatureUnit == "fahrenheit") it * 9.0 / 5.0 + 32.0 else it }
+        "degrees" -> raw?.let { UnitPresentation.temperatureFromC(it, temperatureUnit) }
         else -> null
     }
     val clip = value?.takeIf { it.isFinite() }?.roundToInt()
