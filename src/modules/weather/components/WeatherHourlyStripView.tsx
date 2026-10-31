@@ -8,7 +8,13 @@ import { formatHour } from '@/helpers/format'
 import { wholeTemperatureFromC, type TemperatureUnit } from '@/helpers/units'
 import { weatherIconColor } from '@/modules/weather/lib/weather'
 
-function HourItem({ item, temperatureUnit }: { item: WeatherHour; temperatureUnit: TemperatureUnit }) {
+function HourItem({
+  item,
+  temperatureUnit,
+}: {
+  item: WeatherHour
+  temperatureUnit: TemperatureUnit
+}) {
   return (
     <View style={styles.item}>
       <Text style={styles.hour}>{formatHour(item.minuteOfDay)}</Text>
