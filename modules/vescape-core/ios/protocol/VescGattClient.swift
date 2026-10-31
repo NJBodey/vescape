@@ -312,6 +312,10 @@ internal final class VescGattClient: NSObject, SessionTransport {
   /// resuming from `peripheralIsReady`.
   ///
   /// @parity /modules/vescape-core/android/src/main/java/expo/modules/vescapecore/protocol/VescGattClient.kt `drainWriteQueue`
+  /// @parity /modules/vescape-core/android/src/main/java/expo/modules/vescapecore/protocol/VescChunkedWriter.kt
+  /// TODO(ios parity): on a minimum-MTU (23) link, Android splits each frame into 20-byte chunks
+  /// and keeps the frame atomic in the queue (#620). iOS still writes each frame whole; port the
+  /// chunking to `maximumWriteValueLength` once it can be tested on iOS hardware.
   @discardableResult
   private func drainWriteQueue() -> Bool {
     guard linkUp, let peripheral, let txChar else { return false }

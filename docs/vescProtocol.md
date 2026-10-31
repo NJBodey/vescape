@@ -78,6 +78,10 @@ transport queues every framed packet and sends the next only after the previous
 write callback. This prevents remote-control repeats and telemetry polling from
 causing `writeCharacteristic` busy failures and silently losing commands.
 
+On a link that stays at the minimum MTU of 23, Android splits each frame into
+20-byte chunks and keeps the frame atomic in the queue; see
+[bleAndroid.md](./bleAndroid.md). iOS does not chunk yet.
+
 Note: `COMM_ALIVE` (0x1E) was tried as the first ping — it generates no response, so it cannot confirm the notification path. `COMM_FW_VERSION` must be used instead.
 
 ## BMS cell-group values
