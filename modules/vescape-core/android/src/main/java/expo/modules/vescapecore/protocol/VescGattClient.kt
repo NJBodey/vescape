@@ -62,6 +62,7 @@ internal class VescGattClient(
     private var writeRetry: Runnable? = null
     private var intentionalDisconnect = false
     private val writeQueue = VescWriteQueue()
+    private val writer = VescChunkedWriter(writeQueue)
 
     override fun connect(deviceId: String) {
         val adapter = (context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager).adapter
@@ -97,7 +98,7 @@ internal class VescGattClient(
             cancelCccdTimeout()
             writeRetry?.let { handler.removeCallbacks(it) }
             writeRetry = null
-            writeQueue.clear()
+            writer.clear()
             if (markIntentional && gatt != null) intentionalDisconnect = true
             gatt?.disconnect()
             gatt?.close()
@@ -136,7 +137,9 @@ internal class VescGattClient(
 
         override fun onMtuChanged(gatt: BluetoothGatt, mtu: Int, status: Int) {
             if (gatt !== this@VescGattClient.gatt) return
-            Log.d(VESC_SESSION_TAG, "onMtuChanged mtu=$mtu status=$status")
+            val negotiated = if (status == BluetoothGatt.GATT_SUCCESS) mtu else MIN_ATT_MTU
+            writer.maxWriteBytes = maxWriteBytesForMtu(negotiated)
+            Log.d(VESC_SESSION_TAG, "onMtuChanged mtu=$mtu status=$status maxWriteBytes=${writer.maxWriteBytes}")
             val discoveryStarted = gatt.discoverServices()
             Log.d(VESC_SESSION_TAG, "gatt discoverServices started=$discoveryStarted")
             if (!discoveryStarted) {
@@ -238,22 +241,22 @@ internal class VescGattClient(
             status: Int,
         ) {
             if (gatt !== this@VescGattClient.gatt || characteristic.uuid != NUS_TX_UUID) return
-            val completed = writeQueue.completeInFlight()
-            val bytes = completed?.bytes
-            if (status != BluetoothGatt.GATT_SUCCESS) {
-                Log.w(VESC_SESSION_TAG, "gatt write callback failed status=$status bytes=${bytes?.size}")
+            val success = status == BluetoothGatt.GATT_SUCCESS
+            val frameDone = writer.written(success)
+            if (!success) {
+                Log.w(VESC_SESSION_TAG, "gatt write callback failed status=$status frameDropped=$frameDone")
             }
             drainWriteQueue()
         }
     }
 
     /** Android permits one characteristic write at a time. Serializing all writes
-     * prevents telemetry polling and held remote controls from dropping each other. */
+     * prevents telemetry polling and held remote controls from dropping each other.
+     * Each write is one chunk from [VescChunkedWriter]: a whole frame unless the link is minimum-MTU. */
     private fun drainWriteQueue(): Boolean {
         val g = gatt ?: return false
         val tx = txChar ?: return false
-        val write = writeQueue.startNext() ?: return true
-        val bytes = write.bytes
+        val bytes = writer.next() ?: return true
         writeRetry?.let { handler.removeCallbacks(it) }
         writeRetry = null
         val ok = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -271,7 +274,7 @@ internal class VescGattClient(
             }
         }
         if (!ok) {
-            writeQueue.retryInFlight()
+            writer.refused()
             Log.w(VESC_SESSION_TAG, "gatt writeCharacteristic failed bytes=${bytes.size}; retrying")
             val retry = Runnable { drainWriteQueue() }
             writeRetry = retry
