@@ -1,8 +1,14 @@
 import { createHash } from 'crypto'
 import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'fs'
-import { join, relative } from 'path'
+import { join } from 'path'
 import { wearSharedSources } from '../plugins/wearSharedSources.ts'
-import { copyShared, sharedOutput, sharedSources, sharedTargets } from './copy-shared.ts'
+import {
+  copyShared,
+  posixRelative,
+  sharedOutput,
+  sharedSources,
+  sharedTargets,
+} from './copy-shared.ts'
 
 const ROOT = join(import.meta.dir, '..')
 const CACHE_DIR = join(ROOT, '.expo', 'native-sync')
@@ -88,7 +94,7 @@ function moduleDirs(root: string) {
 
 function hashFiles(paths: string[], root: string, into: Fingerprint) {
   for (const path of paths) {
-    into[relative(root, path)] = hash(readFileSync(path))
+    into[posixRelative(root, path)] = hash(readFileSync(path))
   }
 }
 
@@ -138,8 +144,8 @@ export function podsFingerprint(root = ROOT): Fingerprint {
       fingerprint,
     )
 
-    const layout = files.map((path) => relative(root, path)).join('\n')
-    fingerprint[`${relative(root, iosDir)}#layout`] = hash(layout)
+    const layout = files.map((path) => posixRelative(root, path)).join('\n')
+    fingerprint[`${posixRelative(root, iosDir)}#layout`] = hash(layout)
   }
 
   return fingerprint
@@ -165,7 +171,7 @@ export function missingSharedOutputs(root = ROOT): string[] {
   return sharedTargets(root)
     .flatMap((target) => sharedSources(target).map((source) => sharedOutput(target, source)))
     .filter((output) => !existsSync(output))
-    .map((output) => relative(root, output))
+    .map((output) => posixRelative(root, output))
 }
 
 export function diffFingerprints(previous: Fingerprint, next: Fingerprint): Diff {
